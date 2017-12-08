@@ -23,11 +23,11 @@ def read_cifar10(data_dir, is_train, batch_size, shuffle):
     img_width = 32
     img_height = 32
     img_depth = 3
-    label_bytes = 1 # 笔记中有写，第一位是label
+    label_bytes = 1
     image_bytes = img_width*img_height*img_depth
     
     
-    with tf.name_scope('input'):    # 在tensorboard中，这个就叫做input。画出来比较好看
+    with tf.name_scope('input'):
         
         if is_train:
             filenames = [os.path.join(data_dir, 'data_batch_%d.bin' %ii)
@@ -35,23 +35,23 @@ def read_cifar10(data_dir, is_train, batch_size, shuffle):
         else:
             filenames = [os.path.join(data_dir, 'test_batch.bin')]
           
-        filename_queue = tf.train.string_input_producer(filenames)  # 不同于slice_input_producer. 对于slice，输入是一个list，分别是label和数据。而这一个都在一个二进制文件
+        filename_queue = tf.train.string_input_producer(filenames)
     
-        reader = tf.FixedLengthRecordReader(label_bytes + image_bytes)  # 每一次要读的长度。3073就是一张图片
+        reader = tf.FixedLengthRecordReader(label_bytes + image_bytes)
     
-        key, value = reader.read(filename_queue)    # 用reader读文件，得到一个key和对应的value
+        key, value = reader.read(filename_queue)
            
         record_bytes = tf.decode_raw(value, tf.uint8)
         
         label = tf.slice(record_bytes, [0], [label_bytes])   
-        label = tf.cast(label, tf.int32)    # 把label的数据转换成int
+        label = tf.cast(label, tf.int32)
 
         print (label)
         
-        image_raw = tf.slice(record_bytes, [label_bytes], [image_bytes])    # slice都是从固定长度的list中取值
-        image_raw = tf.reshape(image_raw, [img_depth, img_height, img_width])      # 32 * 32 * 3
-        image = tf.transpose(image_raw, (1,2,0)) # convert from D/H/W to H/W/D      # 转换一下顺序。 把channel放到最后一位
-        image = tf.cast(image, tf.float32)  # 转换格式
+        image_raw = tf.slice(record_bytes, [label_bytes], [image_bytes])
+        image_raw = tf.reshape(image_raw, [img_depth, img_height, img_width])
+        image = tf.transpose(image_raw, (1,2,0))
+        image = tf.cast(image, tf.float32)
 
      
 #        # data argumentation
@@ -61,9 +61,8 @@ def read_cifar10(data_dir, is_train, batch_size, shuffle):
 #        image = tf.image.random_brightness(image, max_delta=63)
 #        image = tf.image.random_contrast(image,lower=0.2,upper=1.8)
 
-
         
-        image = tf.image.per_image_standardization(image) # substract off the mean and divide by the variance 标准化
+        image = tf.image.per_image_standardization(image)
 
 
         if shuffle:
@@ -71,21 +70,16 @@ def read_cifar10(data_dir, is_train, batch_size, shuffle):
                                     [image, label], 
                                     batch_size = batch_size,
                                     num_threads= 16,
-                                    capacity = 2000,    # 最多一次从队列中读取的个数
-                                    min_after_dequeue = 1500) # 每次从队列中取走一个batch，剩下的最少的个数
+                                    capacity = 2000,
+                                    min_after_dequeue = 1500)
         else:
             images, label_batch = tf.train.batch(
                                     [image, label],
                                     batch_size = batch_size,
                                     num_threads = 16,
                                     capacity= 2000)
-
         
         return images, tf.reshape(label_batch, [batch_size])
-
-
-
-
 
 
 ## ONE-HOT      

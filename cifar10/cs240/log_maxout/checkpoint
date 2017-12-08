@@ -1,6 +1,0 @@
-model_checkpoint_path: "/home/ubuntu/my_tensorflow_tutorials/02_CIFAR10/cs240/log_maxout/model.ckpt-9999"
-all_model_checkpoint_paths: "/home/ubuntu/my_tensorflow_tutorials/02_CIFAR10/cs240/log_maxout/model.ckpt-2000"
-all_model_checkpoint_paths: "/home/ubuntu/my_tensorflow_tutorials/02_CIFAR10/cs240/log_maxout/model.ckpt-4000"
-all_model_checkpoint_paths: "/home/ubuntu/my_tensorflow_tutorials/02_CIFAR10/cs240/log_maxout/model.ckpt-6000"
-all_model_checkpoint_paths: "/home/ubuntu/my_tensorflow_tutorials/02_CIFAR10/cs240/log_maxout/model.ckpt-8000"
-all_model_checkpoint_paths: "/home/ubuntu/my_tensorflow_tutorials/02_CIFAR10/cs240/log_maxout/model.ckpt-9999"

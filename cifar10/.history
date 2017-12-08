@@ -1,0 +1,240 @@
+2017-12-07.11-19-46 l
+2017-12-07.11-19-53 python evaluate.py 
+2017-12-07.11-21-30 python evaluate.py 
+2017-12-07.11-22-24 python evaluate.py 
+2017-12-07.11-24-11 python cifar10_maxout.py 
+2017-12-07.11-24-44 python cifar10_maxout.py 
+2017-12-07.11-25-08 python cifar10_maxout.py 
+2017-12-07.11-25-15 python cifar10_maxout.py 
+2017-12-07.11-28-34 python cifar10_maxout.py --job_name ps --task_index 0
+2017-12-07.11-35-47 l
+2017-12-07.11-37-01 l
+2017-12-07.11-37-02 ./par
+2017-12-07.11-37-08 chmod +x parallel.sh 
+2017-12-07.11-37-14 ./parallel.sh 
+2017-12-07.11-39-13 ./parallel.sh 
+2017-12-07.11-43-01 ./parallel.sh 
+2017-12-07.11-43-03 kill %1
+2017-12-07.11-43-04 kill %1
+2017-12-07.11-43-04 kill %1
+2017-12-07.11-43-10 nvidia-smi 
+2017-12-07.17-08-45 l
+2017-12-07.17-17-07 python cifar10_
+2017-12-07.17-18-02 ./parallel.sh 
+2017-12-07.17-18-05 kill %1
+2017-12-07.17-19-42 ./parallel.sh 
+2017-12-07.17-19-46 kill %1
+2017-12-07.17-19-49 kill %1
+2017-12-07.17-19-50 kill %1
+2017-12-07.17-20-32 kill %1
+2017-12-07.17-20-33 ./parallel.sh 
+2017-12-07.17-20-51 ./parallel.sh 
+2017-12-07.17-20-51 ./parallel.sh 
+2017-12-07.17-22-19 ./parallel.sh 
+2017-12-07.17-22-29 ./parallel.sh 
+2017-12-07.17-23-26 ./parallel.sh 
+2017-12-07.17-23-35 ./parallel.sh 
+2017-12-07.17-26-16 ./parallel.sh 
+2017-12-07.17-26-26 ./parallel.sh 
+2017-12-07.17-26-26 ./parallel.sh 
+2017-12-07.17-27-02 ./parallel.sh 
+2017-12-07.17-27-03 ./parallel.sh 
+2017-12-07.17-28-05 ./parallel.sh 
+2017-12-07.17-28-08 ./parallel.sh 
+2017-12-07.17-34-07 ./parallel.sh 
+2017-12-07.17-34-11 ./parallel.sh 
+2017-12-07.17-34-11 ./parallel.sh 
+2017-12-07.17-36-16 python cifar10_maxout.py 
+2017-12-07.17-36-22 python cifar10_maxout.py 
+2017-12-07.17-36-25 python cifar10_maxout.py 
+2017-12-07.17-37-30 python cifar10_maxout.py 
+2017-12-07.17-42-39 CUDA_VISIBLE_DEVICES=0 python cifar10_maxout.py 
+2017-12-07.17-49-03 CUDA_VISIBLE_DEVICES=0 python cifar10_maxout.py 
+2017-12-07.17-49-03 CUDA_VISIBLE_DEVICES=0 python cifar10_maxout.py 
+2017-12-07.18-15-36 l
+2017-12-07.18-15-39 git clone https://github.com/exelban/tensorflow-cifar-10.git
+2017-12-07.18-15-40 l
+2017-12-07.18-15-47 mv tensorflow-cifar-10/include/ .
+2017-12-07.18-15-48 l
+2017-12-07.18-19-27 l
+2017-12-07.18-19-31 python cifar10_maxout.py 
+2017-12-07.18-21-29 pip install urllib --user
+2017-12-07.18-21-35 pip install urllib2 --user
+2017-12-07.18-22-18 pip install urllib2 --user
+2017-12-07.18-23-43 python cifar10_maxout.py 
+2017-12-07.18-28-57 python cifar10_maxout.py 
+2017-12-07.18-35-07 python cifar10_maxout.py 
+2017-12-07.18-36-34 python cifar10_maxout.py 
+2017-12-07.18-41-19 python cifar10_maxout.py 
+2017-12-07.18-41-19 python cifar10_maxout.py 
+2017-12-07.18-41-23 python cifar10_maxout.py 
+2017-12-07.19-02-24 python cifar10_maxout.py 
+2017-12-07.19-06-40 python cifar10_maxout.py 
+2017-12-07.19-07-04 nvidia-smi 
+2017-12-07.19-07-13 ps aux | grep python
+2017-12-07.19-07-19 kill 21948
+2017-12-07.19-07-35 python cifar10_maxout.py 
+2017-12-07.19-14-37 python cifar10_maxout.py 
+2017-12-07.19-15-43 python cifar10_maxout.py 
+2017-12-07.19-16-26 python cifar10_maxout.py 
+2017-12-07.19-20-21 python cifar10_maxout.py 
+2017-12-07.19-20-34 python cifar10_maxout.py 
+2017-12-07.19-20-50 python cifar10_maxout.py 
+2017-12-07.19-21-47 python cifar10_maxout.py 
+2017-12-07.19-22-57 python cifar10_maxout.py 
+2017-12-07.19-26-57 python cifar10_maxout.py 
+2017-12-07.19-29-41 python cifar10_maxout.py 
+2017-12-07.19-30-30 python cifar10_maxout.py 
+2017-12-07.19-33-02 python cifar10_maxout.py 
+2017-12-07.19-36-01 python cifar10_maxout.py 
+2017-12-07.20-00-16 python cifar10_maxout.py 
+2017-12-07.20-00-16 python cifar10_maxout.py 
+2017-12-07.20-00-16 python cifar10_maxout.py 
+2017-12-07.20-00-16 python cifar10_maxout.py 
+2017-12-07.20-23-26 l
+2017-12-07.20-30-41 python cifar10_
+2017-12-07.20-32-48 python cifar10_maxout.py 
+2017-12-07.20-32-59 python cifar10_maxout.py 
+2017-12-07.20-35-18 python cifar10_maxout.py 
+2017-12-07.20-35-48 l
+2017-12-07.20-35-58 l
+2017-12-07.20-36-33 python cifar10_maxout.py 
+2017-12-07.20-37-15 python cifar10_maxout.py 
+2017-12-07.20-37-15 python cifar10_maxout.py 
+2017-12-07.20-37-16 python cifar10_maxout.py 
+2017-12-07.20-37-17 python cifar10_maxout.py 
+2017-12-07.20-42-32 l
+2017-12-07.20-42-34 python cifar10_maxout.py 
+2017-12-07.20-46-08 ./parallel.sh
+2017-12-07.20-46-41 k
+2017-12-07.20-46-41 k
+2017-12-07.20-46-54 k
+2017-12-07.20-47-20 k
+2017-12-07.20-47-21 k
+2017-12-07.20-47-21 k
+2017-12-07.20-48-09 ./parallel.sh
+2017-12-07.20-49-59 ./parallel.sh
+2017-12-07.20-50-11 ./parallel.sh
+2017-12-07.20-51-35 ./parallel.sh
+2017-12-07.20-53-25 ./parallel.sh
+2017-12-07.20-53-49 ./parallel.sh
+2017-12-07.20-53-50 ./parallel.sh
+2017-12-07.20-54-20 ./parallel.sh
+2017-12-07.20-55-40 p
+2017-12-07.20-55-40 p
+2017-12-07.20-55-43 p
+2017-12-07.20-55-44 l
+2017-12-07.20-56-30 ./parallel.sh
+2017-12-07.20-58-25 ./parallel.sh
+2017-12-07.20-58-53 ./parallel.sh
+2017-12-07.20-58-53 ./parallel.sh
+2017-12-07.21-01-41 ./parallel.sh
+2017-12-07.21-01-47 ./parallel.sh
+2017-12-07.21-01-47 ./parallel.sh
+2017-12-07.21-01-47 ./parallel.sh
+2017-12-07.21-02-12 python cifar10_maxout.py 
+2017-12-07.21-03-04 python cifar10_maxout.py 
+2017-12-07.21-04-36 ./parallel.sh
+2017-12-07.21-05-07 ./parallel.sh
+2017-12-07.21-05-07 ./parallel.sh
+2017-12-07.21-05-31 ./parallel.sh
+2017-12-07.21-05-31 ./parallel.sh
+2017-12-07.21-05-36 ./parallel.sh
+2017-12-07.21-05-44 ./parallel.sh
+2017-12-07.21-05-56 ./parallel.sh
+2017-12-07.21-05-56 ./parallel.sh
+2017-12-07.21-06-09 python cifar10_maxout.py
+2017-12-07.21-07-33 ./pra
+2017-12-07.21-07-36 ./parallel.sh 
+2017-12-07.21-07-54 l
+2017-12-07.21-08-01 rm -r data
+2017-12-07.21-08-01 l
+2017-12-07.21-13-20 ./parallel.sh 
+2017-12-07.21-13-36 ps aux | grep python
+2017-12-07.21-13-44 kill 22097 22098 22099 22100
+2017-12-07.21-13-45 ./parallel.sh 
+2017-12-07.21-13-45 ./parallel.sh 
+2017-12-07.21-20-08 ./parallel.sh 
+2017-12-07.21-20-08 ./parallel.sh 
+2017-12-07.21-20-12 nvidia-smi 
+2017-12-07.21-21-34 ps aux | grep python
+2017-12-07.21-21-44 kill 11939 11940 11940 11941 11941 11942
+2017-12-07.21-21-47 ./parallel.sh 
+2017-12-07.21-21-47 ./parallel.sh 
+2017-12-07.21-22-24 ./parallel.sh 
+2017-12-07.21-23-49 ./parallel.sh 
+2017-12-07.21-23-51 ps aux | grep python
+2017-12-07.21-23-59 kill 16790 16791 16792 16793
+2017-12-07.21-24-01 ./parallel.sh 
+2017-12-07.21-24-01 ./parallel.sh 
+2017-12-07.21-24-02 ./parallel.sh 
+2017-12-07.21-24-18 ./parallel.sh 
+2017-12-07.21-28-11 ./parallel.sh 
+2017-12-07.21-28-14 ps aux | grep python
+2017-12-07.21-28-20 kill 22174 22175 22176
+2017-12-07.21-28-22 ./parallel.sh 
+2017-12-07.21-28-23 ./parallel.sh 
+2017-12-07.21-28-29 kill 22174 22175 22176 22177
+2017-12-07.21-30-59 ./parallel.sh 
+2017-12-07.21-32-36 ps aux | grep python
+2017-12-07.21-32-42 kill 3892 3893 3894 3895
+2017-12-07.21-32-44 ./parallel.sh 
+2017-12-07.21-32-45 ./parallel.sh 
+2017-12-07.21-42-39 ./parallel.sh 
+2017-12-07.21-48-29 nvidia-smi 
+2017-12-07.21-48-34 ./parallel.sh 
+2017-12-07.21-48-35 ./parallel.sh 
+2017-12-07.21-51-12 ./parallel.sh 
+2017-12-07.21-54-44 ./parallel.sh 
+2017-12-07.21-54-51 ps aux | grep python
+2017-12-07.21-54-58 kill 9988 16455 16456 16457
+2017-12-07.21-55-02 ./parallel.sh 
+2017-12-07.21-55-02 ./parallel.sh 
+2017-12-07.21-55-02 ./parallel.sh 
+2017-12-07.21-57-44 [A
+2017-12-07.21-57-45 ./parallel.sh 
+2017-12-07.22-02-00 ps aux | grep python
+2017-12-07.22-02-09 kill 13267 30336 30337 30338 30339
+2017-12-07.22-18-43 kill 13267 30336 30337 30338
+2017-12-07.22-18-46 kill 30339
+2017-12-07.22-18-47 ./parallel.sh 
+2017-12-07.22-18-47 ./parallel.sh 
+2017-12-07.22-21-09 ./parallel.sh 
+2017-12-07.22-21-22 ./parallel.sh 
+2017-12-07.22-21-50 ./parallel.sh 
+2017-12-07.22-22-12 ps aux | grep python
+2017-12-07.22-22-16 kill 14163 14443
+2017-12-07.22-22-19 ./parallel.sh 
+2017-12-07.22-22-19 ./parallel.sh 
+2017-12-07.22-24-00 ./parallel.sh 
+2017-12-07.22-24-01 ./parallel.sh 
+2017-12-07.22-25-28 ./parallel.sh 
+2017-12-07.22-27-23 nvcc --version
+2017-12-07.22-27-45 python
+2017-12-07.22-28-58 ./parallel.sh 
+2017-12-07.22-29-01 ps aux | grep python
+2017-12-07.22-29-08 kill 15248 15249 15250 15251 
+2017-12-07.22-29-10 ./parallel.sh 
+2017-12-07.22-29-10 ./parallel.sh 
+2017-12-07.22-32-37 l
+2017-12-07.22-32-42 rm -r tensorflow-cifar-10
+2017-12-07.22-32-44 rm -rf tensorflow-cifar-10
+2017-12-07.22-32-44 l
+2017-12-07.22-32-52 rm -r images
+2017-12-07.22-32-53 l
+2017-12-07.22-33-15 vim .gitignore
+2017-12-07.22-33-33 l
+2017-12-07.22-33-38 rm -r maxout
+2017-12-07.22-33-40 git add --all .
+2017-12-07.22-33-50 du -sh .
+2017-12-07.22-33-59 rm -r data_set/
+2017-12-07.22-34-06 git add --all .
+2017-12-07.22-34-08 du -sh .
+2017-12-07.22-34-20 du -sh data_set
+2017-12-07.22-34-30 du -sh .
+2017-12-07.22-34-41 du -sh cs240/
+2017-12-07.22-34-48 l
+2017-12-07.22-34-50 rm -r cs240
+2017-12-07.22-34-54 du -sh log
+2017-12-07.22-34-57 rm -r log
+2017-12-07.22-35-01 git add --all .

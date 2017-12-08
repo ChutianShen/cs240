@@ -5,15 +5,9 @@ import time
 import numpy as np
 import tensorflow as tf
 
-import cifar10_input
 import os
 import argparse
-
-
-# Uncomment when training on only CPU
-# os.environ["CUDA_VISIBLE_DEVICES"]="-1"
-
-
+from include.data import get_data_set
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--mode', default= 'RELU', help='RELU/MAXOUT')
@@ -22,11 +16,13 @@ parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU
 parser.add_argument('--max_epoch', type=int, default=25000, help='Epoch to run')
 parser.add_argument('--display_step', type=int, default=1, help='The frequency to displace training progress')
 parser.add_argument('--batch_size', type=int, default=128, help='Batch Size during training [default: 24]')
-parser.add_argument('--learning_rate', type=float, default=0.05, help='Initial learning rate [default: 0.05]')
+parser.add_argument('--learning_rate', type=float, default=0.04, help='Initial learning rate [default: 0.05]')
 parser.add_argument('--momentum', type=float, default=0.9, help='Initial learning rate [default: 0.9]')
 parser.add_argument('--optimizer', default='adam', help='adam or momentum [default: adam]')
 parser.add_argument('--decay_step', type=int, default=300000, help='Decay step for lr decay [default: 300000]')
 parser.add_argument('--decay_rate', type=float, default=0.5, help='Decay rate for lr decay [default: 0.5]')
+parser.add_argument('--job_name', type=str, default="", help='Decay rate for lr decay [default: 0.5]')
+parser.add_argument('--task_index', type=int, default=0, help='Decay rate for lr decay [default: 0.5]')
 FLAGS = parser.parse_args()
 
 MODE = FLAGS.mode
@@ -40,6 +36,9 @@ MOMENTUM = FLAGS.momentum
 OPTIMIZER = FLAGS.optimizer
 DECAY_STEP = FLAGS.decay_step
 DECAY_RATE = FLAGS.decay_rate
+NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 50000
+ITERATION = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN / BATCH_SIZE
+NUM_EPOCHS_PER_DECAY = 350.0
 
 if MODE != 'RELU' and MODE != 'MAXOUT':
     print ("Please input mode: RELU or MAXOUT !!!")
@@ -134,11 +133,9 @@ def inference(images):
         if DROPOUT == 1:
             pool2 = tf.nn.dropout(pool2, keep_prob2)
         '''
-
     #local3
     with tf.variable_scope('local3') as scope:
-        reshape = tf.reshape(pool2, shape=[BATCH_SIZE, -1])
-        dim = reshape.get_shape()[1].value
+        dim = pool2.shape[1].value * pool2.shape[2].value * pool2.shape[3].value
         weights = tf.get_variable('weights',
                                   shape=[dim,384],
                                   dtype=tf.float32,
@@ -152,14 +149,14 @@ def inference(images):
         if DROPOUT == 1:
             reshape = tf.nn.dropout(reshape, keep_prob_local3)
         '''
-
-        local3 = tf.nn.relu(tf.matmul(reshape, weights) + biases, name=scope.name)
+        flatten = tf.reshape(pool2, (-1, dim))
+        local3 = tf.nn.relu(tf.matmul(flatten, weights) + biases, name=scope.name)
         
 
         if MODE == 'RELU':
-            local3 = tf.nn.relu(tf.matmul(reshape, weights) + biases, name=scope.name)
+            local3 = tf.nn.relu(tf.matmul(flatten, weights) + biases, name=scope.name)
         elif MODE == 'MAXOUT':
-            local3 = tf.contrib.layers.maxout(tf.matmul(reshape, weights) + biases, 384, name=scope.name)
+            local3 = tf.contrib.layers.maxout(tf.matmul(flatten, weights) + biases, 384, name=scope.name)
             # local3 = max_out(pre_activation, 50, name=scope.name)
 
     
@@ -209,157 +206,134 @@ def inference(images):
     return softmax_linear
 
 def losses(logits, labels):
-    with tf.variable_scope('loss') as scope:
-        
-        labels = tf.cast(labels, tf.int64)
-        
-        # to use this loss fuction, one-hot encoding is needed!
-        # cross_entropy = tf.nn.softmax_cross_entropy_with_logits\
-        #                 (logits=logits, labels=labels, name='xentropy_per_example')
+    labels = tf.cast(labels, tf.int64)
 
-                        
-        cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels, name='xentropy_per_example')
-                        
-        loss = tf.reduce_mean(cross_entropy, name='loss')
-        tf.summary.scalar(scope.name+'/loss', loss)
-        
+    # to use this loss fuction, one-hot encoding is needed!
+    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels, name='xentropy_per_example')
+
+    loss = tf.reduce_mean(cross_entropy, name='loss')
+    tf.summary.scalar('loss', loss)
     return loss
 
+def asynchrounous_train():
+    parameter_servers = ["127.0.0.1:2222"]
+    workers = ["127.0.0.1:2223", "127.0.0.1:2224", "127.0.0.1:2225"]
+    cluster = tf.train.ClusterSpec({"ps":parameter_servers, "worker":workers})
+    log_dir = 'log'
+    train_x, train_y, train_l = get_data_set()
+    test_x, test_y, test_l = get_data_set("test")
+    start_time = time.time()
 
-#%% Train the model on the training data
-# you need to change the training data directory below
+    print "Loading cifar10 images"
+    server = tf.train.Server(cluster, job_name=FLAGS.job_name, task_index=FLAGS.task_index)
+    print "Successfully building the server"
+    if FLAGS.job_name == "ps":
+        server.join()
+    elif FLAGS.job_name == "worker":
+        with tf.device(tf.train.replica_device_setter(worker_device="/job:worker/task:%d" % FLAGS.task_index, cluster=cluster)):
+            print "Enter the worker mode {}".format(FLAGS.task_index)
 
+            my_global_step = tf.Variable(0, name='global_step', trainable=False)
+            images = tf.placeholder(tf.float32, [None, 32, 32, 3])
+            labels = tf.placeholder(tf.float32, [None, train_y.shape[1]])
+            logits = inference(images)
+            loss = losses(logits, labels)
+            acc = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
+            acc = tf.reduce_mean(tf.cast(acc, tf.float32))
+            global_step = tf.Variable(0, trainable=True)
 
+            num_batches_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN / FLAGS.batch_size
+            decay_steps = int(num_batches_per_epoch * NUM_EPOCHS_PER_DECAY)
+            lr = tf.train.exponential_decay(FLAGS.learning_rate, global_step, decay_steps, 0.9, staircase=True)
+
+            optimizer = tf.train.GradientDescentOptimizer(lr)
+            train_op = optimizer.minimize(loss, global_step=my_global_step)
+
+            saver = tf.train.Saver(tf.global_variables())
+            tf.summary.scalar("loss", loss)
+            summary_op = tf.summary.merge_all()
+
+            init = tf.global_variables_initializer()
+
+            print("Variables initialized ...")
+
+        sv = tf.train.Supervisor(is_chief=(FLAGS.task_index == 0), global_step=global_step, init_op=init)
+
+        with sv.prepare_or_wait_for_session(server.target) as sess:
+            summary_writer = tf.summary.FileWriter(log_dir, sess.graph)
+            for epoch in np.arange(MAX_EPOCH):
+                for _ in np.arange(ITERATION):
+                    randidx = np.random.randint(len(train_x), size=FLAGS.batch_size)
+                    batch_xs = train_x[randidx].reshape((-1, 32, 32, 3))
+                    batch_ys = train_y[randidx].astype("float32")
+
+                    _, loss_value, summary_str, step = sess.run([train_op, loss, summary_op, my_global_step],
+                                                                feed_dict={images: batch_xs, labels: batch_ys})
+                    summary_writer.add_summary(summary_str, step)
+
+                    if step % 100 == 0 and step > 0:
+                        print ('Task: %d, Step: %d, loss: %.4f' % (FLAGS.task_index, step, loss_value))
+
+                    if step % 1000 == 0 and step > 0 and FLAGS.task_index != 1:
+                        batch_xs = test_x.reshape((-1, 32, 32, 3))
+                        batch_ys = test_y.astype("float32")
+                        accuracy = sess.run(acc, feed_dict={images: batch_xs, labels: batch_ys})
+                        print ('Elapsed time: %.4f, Accuracy: %.4f' % (time.time() - start_time, accuracy))
+                        checkpoint_path = os.path.join(log_dir, 'model.ckpt')
+                        saver.save(sess, checkpoint_path, global_step=step)
 
 def train():
-    
     my_global_step = tf.Variable(0, name='global_step', trainable=False)
-    
-    
-    data_dir = ''
-    log_dir = ''
-    
-    images, labels = cifar10_input.read_cifar10(data_dir=data_dir,
-                                                is_train=True,
-                                                batch_size= BATCH_SIZE,
-                                                shuffle=True)
+
+    log_dir = 'log'
+
+    train_x, train_y, train_l = get_data_set()
+    test_x, test_y, test_l = get_data_set("test")
+
+    images = tf.placeholder(tf.float32, [None, 32, 32, 3])
+    labels = tf.placeholder(tf.float32, [None, train_y.shape[1]])
     logits = inference(images)
-    
+    #y_pred_cls = tf.argmax(logits, 10)
     loss = losses(logits, labels)
-    
+    acc = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
+    acc = tf.reduce_mean(tf.cast(acc, tf.float32))
+
     global_step = tf.Variable(0, trainable=True)
     learning_rate = tf.train.exponential_decay(BASE_LEARNING_RATE, global_step=global_step, decay_steps=10, decay_rate=0.9)   
     
     optimizer = tf.train.GradientDescentOptimizer(learning_rate)
-    train_op = optimizer.minimize(loss, global_step= my_global_step)
+    train_op = optimizer.minimize(loss, global_step=my_global_step)
     
     saver = tf.train.Saver(tf.global_variables())
+    tf.summary.scalar("loss", loss)
     summary_op = tf.summary.merge_all()
-    
-    
-    
+
     init = tf.global_variables_initializer()
     sess = tf.Session()
+
     sess.run(init)
-    
-    coord = tf.train.Coordinator()
-    threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-    
+
     summary_writer = tf.summary.FileWriter(log_dir, sess.graph)
-    
-    try:
-        for step in np.arange(MAX_EPOCH):
-            if coord.should_stop():
-                    break
-            _, loss_value = sess.run([train_op, loss])
-               
-            if step % 50 == 0:                 
+    for epoch in np.arange(5):
+        for step in np.arange(ITERATION):
+            randidx = np.random.randint(len(train_x), size=FLAGS.batch_size)
+            batch_xs = train_x[randidx].reshape((-1, 32, 32, 3))
+            batch_ys = train_y[randidx].astype("float32")
+
+            _, loss_value, summary_str = sess.run([train_op, loss, summary_op], feed_dict={images: batch_xs, labels: batch_ys})
+            summary_writer.add_summary(summary_str, step)
+
+            if step % 50 == 0 and step > 0:
                 print ('Step: %d, loss: %.4f' % (step, loss_value))
-                
-            if step % 100 == 0:
-                summary_str = sess.run(summary_op)
-                summary_writer.add_summary(summary_str, step)                
-    
-            if step % 2000 == 0 or (step + 1) == MAX_EPOCH:
+
+            if step % 1000 == 0 and step > 0 and FLAGS.task_index != 1:
+                batch_xs = test_x.reshape((-1, 32, 32, 3))
+                batch_ys = test_y.astype("float32")
+                accuracy = sess.run(acc, feed_dict={images: batch_xs, labels: batch_ys})
+                print ('Accuracy: %.4f' % accuracy)
                 checkpoint_path = os.path.join(log_dir, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
-                
-    except tf.errors.OutOfRangeError:
-        print('Done training -- epoch limit reached')
-    finally:
-        coord.request_stop()
-        
-    coord.join(threads)
-    sess.close()
 
 
-start_time = time.time()
-train()
-end_time = time.time()
-print("Time Consuming: " + str(end_time - start_time))
-
-
-#%% To test the model on the test data
-
-
-
-
-def evaluate():
-    with tf.Graph().as_default():
-        
-        log_dir = ''
-        test_dir = ''
-        n_test = 10000
-        
-        
-        # reading test data
-        images, labels = cifar10_input.read_cifar10(data_dir=test_dir,
-                                                    is_train=False,
-                                                    batch_size= BATCH_SIZE,
-                                                    shuffle=False)
-
-        logits = inference(images)
-        top_k_op = tf.nn.in_top_k(logits, labels, 1)
-        saver = tf.train.Saver(tf.global_variables())
-        
-        with tf.Session() as sess:
-            
-            print("Reading checkpoints...")
-            ckpt = tf.train.get_checkpoint_state(log_dir)
-            if ckpt and ckpt.model_checkpoint_path:
-                global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
-                saver.restore(sess, ckpt.model_checkpoint_path)
-                print('Loading success, global_step is %s' % global_step)
-            else:
-                print('No checkpoint file found')
-                return
-        
-            coord = tf.train.Coordinator()
-            threads = tf.train.start_queue_runners(sess = sess, coord = coord)
-            
-            try:
-                num_iter = int(math.ceil(n_test / BATCH_SIZE))
-                true_count = 0
-                total_sample_count = num_iter * BATCH_SIZE
-                step = 0
-
-                while step < num_iter and not coord.should_stop():
-                    predictions = sess.run([top_k_op])
-                    true_count += np.sum(predictions)
-                    step += 1
-                    precision = true_count / total_sample_count
-            except Exception as e:
-                coord.request_stop(e)
-            finally:
-                coord.request_stop()
-                coord.join(threads)
-    
-#%%
-evaluate()
-
-
-
-
-
-
-        
+if __name__ == "__main__":
+    asynchrounous_train()
