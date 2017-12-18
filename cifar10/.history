@@ -337,3 +337,7 @@
 2017-12-08.12-18-38 tensorboard --logdir=log/
 2017-12-08.13-31-38 screen -r
 2017-12-17.20-04-29 l
+2017-12-17.20-04-37 git commit -a -m 'project'
+2017-12-17.20-04-47 git push origin master
+2017-12-17.20-04-53 git push origin master
+2017-12-17.20-05-05 git push origin master
