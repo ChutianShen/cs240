@@ -341,3 +341,8 @@
 2017-12-17.20-04-47 git push origin master
 2017-12-17.20-04-53 git push origin master
 2017-12-17.20-05-05 git push origin master
+2017-12-17.20-12-36 l
+2017-12-17.20-12-43 l
+2017-12-17.20-12-50 l
+2017-12-17.20-12-53 git add data_set/*
+2017-12-17.20-12-59 git commti -a -m 'add dataset'
