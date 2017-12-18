@@ -238,3 +238,102 @@
 2017-12-07.22-34-54 du -sh log
 2017-12-07.22-34-57 rm -r log
 2017-12-07.22-35-01 git add --all .
+2017-12-07.22-35-15 git commit -a -m 'neccessary staff'
+2017-12-07.22-35-24 l
+2017-12-07.22-35-38 git push
+2017-12-07.22-36-53 pip uninstall tensorflow-gpu
+2017-12-07.22-37-13 pip install tensorflow-gpu --user
+2017-12-07.22-37-23 ./parallel.sh 
+2017-12-07.22-39-44 ./parallel.sh 
+2017-12-07.22-39-52 ps aux | grep python
+2017-12-07.22-39-56 kill 28481
+2017-12-07.22-39-59 ./parallel.sh 
+2017-12-07.22-40-01 ps aux | grep python
+2017-12-07.22-40-09 ps aux | grep python
+2017-12-07.22-40-12 ps aux | grep python
+2017-12-07.22-40-42 ps aux | grep python
+2017-12-07.22-43-57 ps aux | grep python
+2017-12-07.22-44-02 kill 28681 28682 28683 28684
+2017-12-07.22-44-04 ./parallel.sh 
+2017-12-07.22-44-04 ./parallel.sh 
+2017-12-07.22-44-04 ./parallel.sh 
+2017-12-08.09-52-07 l
+2017-12-08.09-53-14 ./parallel.sh 
+2017-12-08.09-53-25 ./parallel.sh 
+2017-12-08.09-53-25 ./parallel.sh 
+2017-12-08.09-53-50 ps aux | grep python
+2017-12-08.09-53-53 kill 5772
+2017-12-08.09-53-57 ./parallel.sh 
+2017-12-08.09-53-58 ./parallel.sh 
+2017-12-08.09-55-03 ./parallel.sh 
+2017-12-08.09-56-10 ps aux | grep python
+2017-12-08.09-56-13 kill 6065
+2017-12-08.09-58-59 python cifar10_maxout.py 
+2017-12-08.09-59-59 python cifar10_maxout.py 
+2017-12-08.10-02-49 python cifar10_maxout.py 
+2017-12-08.10-03-53 python cifar10_maxout.py 
+2017-12-08.10-06-39 python cifar10_maxout.py 
+2017-12-08.10-14-30 python cifar10_maxout.py 
+2017-12-08.10-14-38 l
+2017-12-08.10-17-23 python cifar10_maxout.py
+2017-12-08.10-20-59 python cifar10_maxout.py
+2017-12-08.10-28-13 python cifar10_maxout.py 
+2017-12-08.10-35-42 python cifar10_maxout.py 
+2017-12-08.10-36-47 ./parallel.sh 
+2017-12-08.10-37-35 ./parallel.sh 
+2017-12-08.10-37-44 ps aux | grep python
+2017-12-08.10-37-52 kill 8148 8149 8150 8151
+2017-12-08.10-37-54 kil
+2017-12-08.10-37-54 kil
+2017-12-08.10-37-57 ps aux | grep python
+2017-12-08.10-38-19 ./parallel.sh 
+2017-12-08.10-41-22 ./parallel.sh 
+2017-12-08.10-41-29 ps aux | grep python
+2017-12-08.10-41-35 kill 8423 8424 8425 8426
+2017-12-08.10-41-37 ./parallel.sh 
+2017-12-08.10-41-37 ./parallel.sh 
+2017-12-08.10-42-00 ./parallel.sh 
+2017-12-08.10-45-34 ps aux | grep python
+2017-12-08.10-45-40 kill 19437 19438 19440
+2017-12-08.10-45-50 ./parallel.sh 
+2017-12-08.10-47-46 tensorboard --logdir=path/to/log-directory
+2017-12-08.10-49-15 tensorboard --logdir=log/
+2017-12-08.10-49-16 l
+2017-12-08.10-50-28 l
+2017-12-08.10-52-20 ./parallel.sh 
+2017-12-08.10-52-53 ./parallel.sh 
+2017-12-08.10-53-07 ./parallel.sh 
+2017-12-08.10-54-12 ./parallel.sh 
+2017-12-08.10-54-41 ./parallel.sh 
+2017-12-08.10-54-42 ./parallel.sh 
+2017-12-08.10-55-29 ./parallel.sh 
+2017-12-08.10-57-23 ./parallel.sh 
+2017-12-08.10-57-23 ./parallel.sh 
+2017-12-08.10-58-56 rm log/*
+2017-12-08.10-58-59 rm -r log/*
+2017-12-08.10-59-00 l
+2017-12-08.10-59-26 ./parallel.sh 
+2017-12-08.11-00-19 ./parallel.sh 
+2017-12-08.11-00-19 ./parallel.sh 
+2017-12-08.11-00-19 ./parallel.sh 
+2017-12-08.11-00-24 screen -r
+2017-12-08.11-00-35 tensorboard --logdir=log/
+2017-12-08.11-03-38 ./parallel.sh 
+2017-12-08.11-03-40 tensorboard --logdir=log/
+2017-12-08.11-03-56 ./parallel.sh 
+2017-12-08.11-08-12 ./parallel.sh 
+2017-12-08.11-08-12 ./parallel.sh 
+2017-12-08.11-08-12 ./parallel.sh 
+2017-12-08.11-09-12 ./parallel.sh 
+2017-12-08.11-09-41 ./parallel.sh 
+2017-12-08.11-09-42 ./parallel.sh 
+2017-12-08.11-09-42 ./parallel.sh 
+2017-12-08.11-10-11 ./parallel.sh 
+2017-12-08.11-10-12 ./parallel.sh 
+2017-12-08.11-10-19 ./parallel.sh 
+2017-12-08.11-14-49 ./parallel.sh 
+2017-12-08.11-17-48 ./parallel.sh 
+2017-12-08.11-28-30 ./parallel.sh 
+2017-12-08.12-18-38 tensorboard --logdir=log/
+2017-12-08.13-31-38 screen -r
+2017-12-17.20-04-29 l

@@ -10,13 +10,13 @@ import argparse
 from include.data import get_data_set
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--mode', default= 'RELU', help='RELU/MAXOUT')
+parser.add_argument('--mode', default='RELU', help='RELU/MAXOUT')
 parser.add_argument('--dropout', type=float, default=0, help='Set the dropout')
 parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU 0]')
 parser.add_argument('--max_epoch', type=int, default=25000, help='Epoch to run')
 parser.add_argument('--display_step', type=int, default=1, help='The frequency to displace training progress')
 parser.add_argument('--batch_size', type=int, default=128, help='Batch Size during training [default: 24]')
-parser.add_argument('--learning_rate', type=float, default=0.04, help='Initial learning rate [default: 0.05]')
+parser.add_argument('--learning_rate', type=float, default=0.05, help='Initial learning rate [default: 0.05]')
 parser.add_argument('--momentum', type=float, default=0.9, help='Initial learning rate [default: 0.9]')
 parser.add_argument('--optimizer', default='adam', help='adam or momentum [default: adam]')
 parser.add_argument('--decay_step', type=int, default=300000, help='Decay step for lr decay [default: 300000]')
@@ -113,7 +113,7 @@ def inference(images):
         if MODE == 'RELU':
             conv2 = tf.nn.relu(pre_activation, name='conv2')
         elif MODE == 'MAXOUT':
-            conv2 = tf.contrib.layers.maxout(pre_activation, 32, name=scope.name)
+            conv2 = tf.reshape(tf.contrib.layers.maxout(pre_activation, 32, name=scope.name),(-1, 16, 16, 32))
             # conv2 = max_out(pre_activation, 50, name=scope.name)
         '''
         keep_prob_conv2 = 0.2
@@ -212,17 +212,17 @@ def losses(logits, labels):
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels, name='xentropy_per_example')
 
     loss = tf.reduce_mean(cross_entropy, name='loss')
-    tf.summary.scalar('loss', loss)
     return loss
 
 def asynchrounous_train():
     parameter_servers = ["127.0.0.1:2222"]
     workers = ["127.0.0.1:2223", "127.0.0.1:2224", "127.0.0.1:2225"]
     cluster = tf.train.ClusterSpec({"ps":parameter_servers, "worker":workers})
-    log_dir = 'log'
+    log_dir = 'log/asynchronous'
     train_x, train_y, train_l = get_data_set()
     test_x, test_y, test_l = get_data_set("test")
     start_time = time.time()
+    history_loss = 0
 
     print "Loading cifar10 images"
     server = tf.train.Server(cluster, job_name=FLAGS.job_name, task_index=FLAGS.task_index)
@@ -242,14 +242,13 @@ def asynchrounous_train():
             acc = tf.reduce_mean(tf.cast(acc, tf.float32))
             global_step = tf.Variable(0, trainable=True)
 
-            num_batches_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN / FLAGS.batch_size
-            decay_steps = int(num_batches_per_epoch * NUM_EPOCHS_PER_DECAY)
-            lr = tf.train.exponential_decay(FLAGS.learning_rate, global_step, decay_steps, 0.9, staircase=True)
+            learning_rate = tf.train.exponential_decay(BASE_LEARNING_RATE, global_step=global_step, decay_steps=1000, decay_rate=0.9)
 
-            optimizer = tf.train.GradientDescentOptimizer(lr)
+            optimizer = tf.train.GradientDescentOptimizer(learning_rate)
             train_op = optimizer.minimize(loss, global_step=my_global_step)
 
             saver = tf.train.Saver(tf.global_variables())
+            tf.summary.scalar("accuracy", acc)
             tf.summary.scalar("loss", loss)
             summary_op = tf.summary.merge_all()
 
@@ -261,26 +260,28 @@ def asynchrounous_train():
 
         with sv.prepare_or_wait_for_session(server.target) as sess:
             summary_writer = tf.summary.FileWriter(log_dir, sess.graph)
-            for epoch in np.arange(MAX_EPOCH):
-                for _ in np.arange(ITERATION):
-                    randidx = np.random.randint(len(train_x), size=FLAGS.batch_size)
-                    batch_xs = train_x[randidx].reshape((-1, 32, 32, 3))
-                    batch_ys = train_y[randidx].astype("float32")
+            for _ in np.arange(10000):
+                randidx = np.random.randint(len(train_x), size=FLAGS.batch_size)
+                batch_xs = train_x[randidx].reshape((-1, 32, 32, 3))
+                batch_ys = train_y[randidx].astype("float32")
 
-                    _, loss_value, summary_str, step = sess.run([train_op, loss, summary_op, my_global_step],
-                                                                feed_dict={images: batch_xs, labels: batch_ys})
+                _, loss_value, summary_str, step = sess.run([train_op, loss, summary_op, my_global_step],
+                                                            feed_dict={images: batch_xs, labels: batch_ys})
+                if (step > 100 and loss_value > history_loss + 1.5) or np.isnan(loss_value):
+                    break
+                else:
+                    history_loss = loss_value
+                summary_writer.add_summary(summary_str, step)
+
+                if step % 100 == 0 and step > 0 and FLAGS.task_index != 1:
+                    print ('Task: %d, Step: %d, loss: %.4f' % (FLAGS.task_index, step, loss_value))
+                    batch_xs = test_x.reshape((-1, 32, 32, 3))
+                    batch_ys = test_y.astype("float32")
+                    accuracy, summary_str = sess.run([acc, summary_op], feed_dict={images: batch_xs, labels: batch_ys})
                     summary_writer.add_summary(summary_str, step)
-
-                    if step % 100 == 0 and step > 0:
-                        print ('Task: %d, Step: %d, loss: %.4f' % (FLAGS.task_index, step, loss_value))
-
-                    if step % 1000 == 0 and step > 0 and FLAGS.task_index != 1:
-                        batch_xs = test_x.reshape((-1, 32, 32, 3))
-                        batch_ys = test_y.astype("float32")
-                        accuracy = sess.run(acc, feed_dict={images: batch_xs, labels: batch_ys})
-                        print ('Elapsed time: %.4f, Accuracy: %.4f' % (time.time() - start_time, accuracy))
-                        checkpoint_path = os.path.join(log_dir, 'model.ckpt')
-                        saver.save(sess, checkpoint_path, global_step=step)
+                    print ('Elapsed time: %.4f, Accuracy: %.4f' % (time.time() - start_time, accuracy))
+                    checkpoint_path = os.path.join(log_dir, 'model.ckpt')
+                    saver.save(sess, checkpoint_path, global_step=step)
 
 def train():
     my_global_step = tf.Variable(0, name='global_step', trainable=False)
@@ -293,7 +294,6 @@ def train():
     images = tf.placeholder(tf.float32, [None, 32, 32, 3])
     labels = tf.placeholder(tf.float32, [None, train_y.shape[1]])
     logits = inference(images)
-    #y_pred_cls = tf.argmax(logits, 10)
     loss = losses(logits, labels)
     acc = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
     acc = tf.reduce_mean(tf.cast(acc, tf.float32))
@@ -314,19 +314,19 @@ def train():
     sess.run(init)
 
     summary_writer = tf.summary.FileWriter(log_dir, sess.graph)
-    for epoch in np.arange(5):
-        for step in np.arange(ITERATION):
+    for epoch in np.arange(MAX_EPOCH):
+        for _ in np.arange(ITERATION):
             randidx = np.random.randint(len(train_x), size=FLAGS.batch_size)
             batch_xs = train_x[randidx].reshape((-1, 32, 32, 3))
             batch_ys = train_y[randidx].astype("float32")
 
-            _, loss_value, summary_str = sess.run([train_op, loss, summary_op], feed_dict={images: batch_xs, labels: batch_ys})
+            _, loss_value, summary_str, step = sess.run([train_op, loss, summary_op, my_global_step], feed_dict={images: batch_xs, labels: batch_ys})
             summary_writer.add_summary(summary_str, step)
 
             if step % 50 == 0 and step > 0:
                 print ('Step: %d, loss: %.4f' % (step, loss_value))
 
-            if step % 1000 == 0 and step > 0 and FLAGS.task_index != 1:
+            if step % 1000 == 0 and step > 0:
                 batch_xs = test_x.reshape((-1, 32, 32, 3))
                 batch_ys = test_y.astype("float32")
                 accuracy = sess.run(acc, feed_dict={images: batch_xs, labels: batch_ys})
@@ -337,3 +337,4 @@ def train():
 
 if __name__ == "__main__":
     asynchrounous_train()
+    #train()
